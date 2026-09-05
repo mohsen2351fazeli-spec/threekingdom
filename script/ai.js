@@ -36,6 +36,7 @@ hola.addEventListener("click", () => {
 
 // //////////////////
 const titr = document.querySelector(".zhuge");
+const titr2 = document.querySelector(".under-zhuge");
 const inputdad = document.querySelector(".input-dad");
 const input = document.querySelector(".ques");
 const btn = document.querySelector(".send-btn");
@@ -58,6 +59,7 @@ input.addEventListener("keyup", e);
 const go = () => {
   inputdad.classList.add("bottom");
   titr.classList.add("hidden");
+  titr2.classList.add("hidden");
 };
 const remove = () => {
   document.querySelector(".spy").remove();
