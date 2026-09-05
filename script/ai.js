@@ -74,7 +74,7 @@ const scrol = () => {
 };
 
 const API_KEY =
-  "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";
+  "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";
 
 const conversation = [];
 
