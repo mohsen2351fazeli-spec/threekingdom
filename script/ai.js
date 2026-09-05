@@ -74,7 +74,7 @@ const scrol = () => {
 };
 
 const API_KEY =
-  "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";
+  "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";
 
 const conversation = [];
 
@@ -126,6 +126,7 @@ const chatWithGroq = async () => {
       throw new Error("fetch error");
     }
     const data = await response.json();
+
     return data.choices?.[0]?.message?.content;
   } catch (error) {
     one.classList.remove("hidden");
