@@ -346,111 +346,369 @@ if (window.innerWidth > 500) {
   shupic.onload = startIfReady;
 }
 
+// ==========================================
+// MUSIC PLAYER
+// ==========================================
+
 const musicTime = document.querySelector(".music-time");
 const musicName = document.querySelector(".music-name");
 const musicPro = document.querySelector(".music-pro");
 const musicCer = document.querySelector(".music-cer");
 const musicProDad = document.querySelector(".music-pro-dad");
 const audio = document.querySelector(".audio");
+
 const omgg = document.querySelectorAll(".omgg");
 const omggt = document.querySelectorAll(".omg-text");
+
 const bar = document.querySelector(".music-bar");
 const closebtn = document.querySelector(".close");
+const btn = document.getElementById("main-btn");
 
 let isDrag = false;
-let isplay = false;
+let isPlaying = false;
 
-omgg.forEach((o, i) => {
-  o.addEventListener("click", () => {
-    audio.setAttribute("src", `../music/${o.dataset.id}.mp3`);
-    musicName.innerHTML = omggt[i].innerHTML;
-    isplay = true;
-    audio.play();
+/* ==========================================
+   FORMAT TIME
+========================================== */
+
+const timeHandler = (time) => {
+  if (!Number.isFinite(time)) {
+    musicTime.textContent = "0:00";
+    return;
+  }
+
+  const minutes = Math.floor(time / 60);
+
+  const seconds = Math.floor(time % 60)
+    .toString()
+    .padStart(2, "0");
+
+  musicTime.textContent = `${minutes}:${seconds}`;
+};
+
+/* ==========================================
+   UPDATE PROGRESS
+========================================== */
+
+const navHandler = (percent) => {
+  if (!Number.isFinite(percent)) {
+    percent = 0;
+  }
+
+  percent = Math.min(Math.max(percent, 0), 100);
+
+  musicPro.style.width = `${percent}%`;
+
+  musicCer.style.left = `${percent}%`;
+};
+
+/* ==========================================
+   GET PERCENT FROM POINTER
+========================================== */
+
+const getPercent = (event) => {
+  const rect = musicProDad.getBoundingClientRect();
+
+  let x = event.clientX - rect.left;
+
+  let percent = (x / rect.width) * 100;
+
+  return Math.min(Math.max(percent, 0), 100);
+};
+
+/* ==========================================
+   SEEK
+========================================== */
+
+const seekAudio = (event) => {
+  if (!Number.isFinite(audio.duration)) {
+    return;
+  }
+
+  const percent = getPercent(event);
+
+  const newTime = (percent / 100) * audio.duration;
+
+  audio.currentTime = newTime;
+
+  navHandler(percent);
+
+  timeHandler(newTime);
+};
+
+/* ==========================================
+   PLAY SELECTED SONG
+========================================== */
+
+omgg.forEach((item, index) => {
+  item.addEventListener("click", async () => {
+    const id = item.dataset.id;
+
+    const title = omggt[index]?.textContent?.trim() || "";
+
+    if (!id) return;
+
+    // آهنگ قبلی متوقف شود
+    audio.pause();
+
+    audio.currentTime = 0;
+
+    // آهنگ جدید
+    audio.src = `../music/${id}.mp3`;
+
+    audio.load();
+
+    // نام آهنگ
+    musicName.textContent = title;
+
+    // ریست Progress
+    navHandler(0);
+    timeHandler(0);
+
+    // نمایش Player
     bar.classList.remove("h0");
-    btn.classList.remove("is-stop");
+
+    // Player در حالت عادی باریک است
+    musicProDad.classList.remove("is-seeking");
+
+    try {
+      await audio.play();
+
+      isPlaying = true;
+
+      btn.classList.remove("is-stop");
+    } catch (error) {
+      console.error("Audio play error:", error);
+
+      isPlaying = false;
+
+      btn.classList.add("is-stop");
+    }
   });
 });
 
-const navHandler = (x) => {
-  musicPro.style.width = `${x}%`;
-  musicCer.style.left = `calc(${x}% - 0.125rem * 4)`;
-};
-const timeHandler = (t) => {
-  musicTime.innerHTML = `${Math.floor(t / 60)}:${Math.floor(t % 60)
-    .toString()
-    .padStart(2, "0")}`;
-};
+/* ==========================================
+   AUDIO TIME UPDATE
+========================================== */
+
 audio.addEventListener("timeupdate", () => {
-  navHandler((audio.currentTime / audio.duration) * 100);
+  // وقتی کاربر در حال Drag است،
+  // timeupdate نباید مقدار Drag را خراب کند.
+
+  if (isDrag) {
+    return;
+  }
+
+  if (!Number.isFinite(audio.duration)) {
+    return;
+  }
+
+  const percent = (audio.currentTime / audio.duration) * 100;
+
+  navHandler(percent);
+
   timeHandler(audio.currentTime);
 });
-musicProDad.addEventListener("pointerdown", (e) => {
+
+/* ==========================================
+   METADATA LOADED
+========================================== */
+
+audio.addEventListener("loadedmetadata", () => {
+  timeHandler(audio.currentTime);
+
+  navHandler(
+    audio.duration > 0 ? (audio.currentTime / audio.duration) * 100 : 0,
+  );
+});
+
+/* ==========================================
+   PLAY
+========================================== */
+
+audio.addEventListener("play", () => {
+  isPlaying = true;
+
+  btn.classList.remove("is-stop");
+});
+
+/* ==========================================
+   PAUSE
+========================================== */
+
+audio.addEventListener("pause", () => {
+  if (!isDrag) {
+    isPlaying = false;
+
+    btn.classList.add("is-stop");
+  }
+});
+
+/* ==========================================
+   SONG ENDED
+========================================== */
+
+audio.addEventListener("ended", () => {
+  isPlaying = false;
+
+  btn.classList.add("is-stop");
+
+  navHandler(100);
+
+  timeHandler(audio.duration);
+});
+
+/* ==========================================
+   START SEEK
+========================================== */
+
+musicProDad.addEventListener("pointerdown", (event) => {
+  if (!Number.isFinite(audio.duration)) {
+    return;
+  }
+
   isDrag = true;
-  musicProDad.setPointerCapture(e.pointerId);
 
-  const rect = musicProDad.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  let percent = (x / musicProDad.clientWidth) * 100;
+  // جلوگیری از رفتارهای لمسی مرورگر
+  event.preventDefault();
 
-  percent = Math.min(Math.max(percent, 0), 100);
+  // حفظ Pointer روی نوار
+  try {
+    musicProDad.setPointerCapture(event.pointerId);
+  } catch (_) {}
 
-  audio.currentTime = (percent / 100) * audio.duration;
+  // ضخیم شدن فقط هنگام Seek
+  musicProDad.classList.add("is-seeking");
 
-  musicProDad.classList.remove("h25s");
-  musicCer.classList.add("hidden");
+  // ذخیره وضعیت پخش
+  const wasPlaying = isPlaying;
+
+  // توقف موقت صوت
   audio.pause();
 
-  navHandler(percent);
-  timeHandler(audio.currentTime);
+  // تغییر زمان همان لحظه‌ای که لمس می‌شود
+  seekAudio(event);
+
+  // وضعیت پخش را برای پایان Drag نگه می‌داریم
+  musicProDad.dataset.wasPlaying = wasPlaying ? "1" : "0";
 });
-musicProDad.addEventListener("pointermove", (e) => {
-  if (!isDrag) return;
 
-  const rect = musicProDad.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  let percent = (x / musicProDad.clientWidth) * 100;
+/* ==========================================
+   MOVE SEEK
+========================================== */
 
-  percent = Math.min(Math.max(percent, 0), 100);
-
-  audio.currentTime = (percent / 100) * audio.duration;
-
-  navHandler(percent);
-  timeHandler(audio.currentTime);
-});
-musicProDad.addEventListener("pointerup", (e) => {
-  isDrag = false;
-  musicProDad.releasePointerCapture(e.pointerId);
-  if (!isplay) {
-    btn.classList.add("is-stop");
-    audio.pause();
-    isplay = false;
-  } else {
-    btn.classList.remove("is-stop");
-    audio.play();
-    isplay = true;
+musicProDad.addEventListener("pointermove", (event) => {
+  if (!isDrag) {
+    return;
   }
-  musicCer.classList.remove("hidden");
-  musicProDad.classList.add("h25s");
-});
-const btn = document.getElementById("main-btn");
 
-btn.onclick = () => {
-  if (isplay) {
-    btn.classList.add("is-stop");
-    audio.pause();
-    isplay = false;
+  event.preventDefault();
+
+  seekAudio(event);
+});
+
+/* ==========================================
+   END SEEK
+========================================== */
+
+const finishSeek = (event) => {
+  if (!isDrag) {
+    return;
+  }
+
+  isDrag = false;
+
+  // آزاد کردن Pointer
+  try {
+    if (musicProDad.hasPointerCapture(event.pointerId)) {
+      musicProDad.releasePointerCapture(event.pointerId);
+    }
+  } catch (_) {}
+
+  // دوباره باریک شود
+  musicProDad.classList.remove("is-seeking");
+
+  // آیا قبل از Drag در حال پخش بود؟
+  const wasPlaying = musicProDad.dataset.wasPlaying === "1";
+
+  delete musicProDad.dataset.wasPlaying;
+
+  if (wasPlaying) {
+    audio.play().catch(() => {
+      isPlaying = false;
+      btn.classList.add("is-stop");
+    });
   } else {
-    btn.classList.remove("is-stop");
-    audio.play();
-    isplay = true;
+    audio.pause();
+
+    isPlaying = false;
+
+    btn.classList.add("is-stop");
   }
 };
+
+/* ==========================================
+   POINTER UP
+========================================== */
+
+musicProDad.addEventListener("pointerup", finishSeek);
+
+/* ==========================================
+   POINTER CANCEL
+========================================== */
+
+musicProDad.addEventListener("pointercancel", finishSeek);
+
+/* ==========================================
+   PLAY / PAUSE BUTTON
+========================================== */
+
+btn.addEventListener("click", async () => {
+  if (!audio.src) {
+    return;
+  }
+
+  if (isPlaying) {
+    audio.pause();
+
+    return;
+  }
+
+  try {
+    await audio.play();
+  } catch (error) {
+    console.error("Audio play error:", error);
+
+    isPlaying = false;
+
+    btn.classList.add("is-stop");
+  }
+});
+
+/* ==========================================
+   CLOSE PLAYER
+========================================== */
+
 closebtn.addEventListener("click", () => {
-  btn.classList.remove("is-stop");
   audio.pause();
-  isplay = false;
+
+  audio.currentTime = 0;
+
+  isPlaying = false;
+
+  isDrag = false;
+
+  navHandler(0);
+
+  timeHandler(0);
+
+  musicProDad.classList.remove("is-seeking");
+
+  btn.classList.add("is-stop");
+
   bar.classList.add("h0");
 });
+
 // poster
 const posterdad = document.querySelector(".poster-dad");
 const poster = document.querySelector(".poster");
