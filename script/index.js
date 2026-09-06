@@ -454,7 +454,7 @@ omgg.forEach((item, index) => {
     audio.currentTime = 0;
 
     // آهنگ جدید
-    audio.src = `../music/${id}.mp3`;
+    audio.src = `https://mohsen2351fazeli-spec.github.io/threekingdom/music/${id}.mp3`;
 
     audio.load();
 
