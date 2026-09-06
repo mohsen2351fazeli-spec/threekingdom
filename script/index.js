@@ -205,10 +205,10 @@ const wei2pic = new Image();
 const wupic = new Image();
 const shupic = new Image();
 
-thronepic.src = "../pngpic/throne.png";
-wei2pic.src = "../pngpic/wei2.png";
-wupic.src = "../pngpic/wu.png";
-shupic.src = "../pngpic/shu.png";
+thronepic.src = "https://mohsen2351fazeli-spec.github.io/threekingdom/pngpic/throne.png";
+wei2pic.src = "https://mohsen2351fazeli-spec.github.io/threekingdom/pngpic/wei2.png";
+wupic.src = "https://mohsen2351fazeli-spec.github.io/threekingdom/pngpic/wu.png";
+shupic.src = "https://mohsen2351fazeli-spec.github.io/threekingdom/pngpic/shu.png";
 
 let t = 0;
 
@@ -724,9 +724,9 @@ const caopic = new Image();
 const glpic = new Image();
 const mainpic = new Image();
 
-caopic.src = "../poster/caocao.png";
-glpic.src = "../poster/guanlobo.png";
-mainpic.src = "../poster/threee.png";
+caopic.src = "https://mohsen2351fazeli-spec.github.io/threekingdom/poster/caocao.png";
+glpic.src = "https://mohsen2351fazeli-spec.github.io/threekingdom/poster/guanlobo.png";
+mainpic.src = "https://mohsen2351fazeli-spec.github.io/threekingdom/poster/threee.png";
 
 if (window.innerWidth > 500) {
   const f = () => {
