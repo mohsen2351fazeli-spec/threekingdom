@@ -375,3 +375,10 @@ h3 {
   text-decoration: underline;
   margin: 0 0.1rem 0 0.1rem;
 }
+.h-head {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem 0 1rem 0;
+  color: orange;
+}
