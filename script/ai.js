@@ -53,24 +53,36 @@ const go = () => {
   titr2?.classList.add("hidden");
 };
 
-const addScrollMarker = () => {
+// Keep exactly ONE .spy element, and always keep it as the LAST child.
+const getSpy = () => {
   if (!bodi) return null;
-  const marker = document.createElement("div");
-  marker.className = "spy";
-  bodi.appendChild(marker);
-  return marker;
+
+  let spy = bodi.querySelector(".spy");
+
+  if (!spy) {
+    spy = document.createElement("div");
+    spy.className = "spy";
+  }
+
+  bodi.appendChild(spy);
+  return spy;
 };
 
-const scrollToMarker = (marker) => {
-  marker?.scrollIntoView({ behavior: "smooth", block: "end" });
+const scrollToSpy = () => {
+  const spy = getSpy();
+  spy?.scrollIntoView({ behavior: "smooth", block: "end" });
 };
 
 const appendMessage = (className, text = "") => {
   if (!bodi) return null;
+
   const message = document.createElement("div");
   message.className = className;
   message.textContent = text;
   bodi.appendChild(message);
+
+  // Move the single spy to the end after every new message.
+  getSpy();
   return message;
 };
 
@@ -85,7 +97,7 @@ const setLoading = (loading) => {
 // IMPORTANT: a frontend API key is visible to every site visitor.
 // Use a restricted key only for temporary experiments, or move the request
 // to your own backend/serverless function for real security.
-const API_KEY = "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";
+const API_KEY = "YOUR_OPENROUTER_API_KEY";
 const MODEL = "qwen/qwen3-30b-a3b:free";
 const ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
 
@@ -154,8 +166,7 @@ btn?.addEventListener("click", async () => {
 
   appendMessage("right", userMessage);
   const pending = appendMessage("pending left");
-  const marker = addScrollMarker();
-  scrollToMarker(marker);
+  scrollToSpy();
 
   conversation.push({ role: "user", content: userMessage });
 
@@ -173,12 +184,12 @@ btn?.addEventListener("click", async () => {
     const typeNextCharacter = () => {
       if (index >= botReply.length) {
         setLoading(false);
-        scrollToMarker(addScrollMarker());
+        scrollToSpy();
         return;
       }
 
       message.textContent += botReply[index++];
-      scrollToMarker(marker);
+      scrollToSpy();
       window.setTimeout(typeNextCharacter, 10);
     };
 
@@ -188,7 +199,7 @@ btn?.addEventListener("click", async () => {
     pending?.remove();
     appendMessage("left", "خطایی در ارتباط با دستیار رخ داد. لطفاً دوباره تلاش کن.");
     setLoading(false);
-    scrollToMarker(addScrollMarker());
+    scrollToSpy();
   }
 });
 
@@ -198,3 +209,6 @@ input?.addEventListener("keydown", (event) => {
     btn?.click();
   }
 });
+
+// Make sure the container starts with exactly one spy at the end.
+getSpy();
