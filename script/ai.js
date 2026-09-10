@@ -2,15 +2,14 @@ const hed = document.querySelector(".header");
 
 window.addEventListener("scroll", () => {
   if (window.scrollY > 0) {
-    hed?.classList.add("h4");
-    document.querySelector(".panel-btn")?.classList.add("t");
+    hed.classList.add("h4");
+    document.querySelector(".panel-btn").classList.add("t");
   } else {
-    hed?.classList.remove("h4");
-    document.querySelector(".panel-btn")?.classList.remove("t");
+    hed.classList.remove("h4");
+    document.querySelector(".panel-btn").classList.remove("t");
   }
 });
-
-// Panel
+// panel
 const pbtn = document.querySelector(".panel-btn");
 const panel = document.querySelector(".panel");
 const hola = document.querySelector(".hola");
@@ -18,19 +17,24 @@ const ca = document.querySelector(".ca");
 const cb = document.querySelector(".cb");
 const cc = document.querySelector(".cc");
 
-const togglePanel = () => {
-  panel?.classList.toggle("w0");
-  pbtn?.classList.toggle("r12");
-  hola?.classList.toggle("hidt");
-  cb?.classList.toggle("hidt");
-  ca?.classList.toggle("cat");
-  cc?.classList.toggle("cct");
-};
+pbtn.addEventListener("click", () => {
+  panel.classList.toggle("w0");
+  pbtn.classList.toggle("r12");
+  hola.classList.toggle("hidt");
+  cb.classList.toggle("hidt");
+  ca.classList.toggle("cat");
+  cc.classList.toggle("cct");
+});
+hola.addEventListener("click", () => {
+  panel.classList.toggle("w0");
+  pbtn.classList.toggle("r12");
+  hola.classList.toggle("hidt");
+  cb.classList.toggle("hidt");
+  ca.classList.toggle("cat");
+  cc.classList.toggle("cct");
+});
 
-pbtn?.addEventListener("click", togglePanel);
-hola?.addEventListener("click", togglePanel);
-
-// AI chat UI
+// //////////////////
 const titr = document.querySelector(".zhuge");
 const titr2 = document.querySelector(".under-zhuge");
 const inputdad = document.querySelector(".input-dad");
@@ -40,175 +44,149 @@ const bodi = document.querySelector(".wwe");
 const one = document.querySelector(".one");
 const two = document.querySelector(".two");
 const three = document.querySelector(".three");
+const main2 = document.querySelector(".main-2");
 
-const updateSendButton = () => {
-  btn?.classList.toggle("o1", Boolean(input?.value.trim()));
+const e = () => {
+  if (input.value.trim()) {
+    btn.classList.add("o1");
+  } else {
+    btn.classList.remove("o1");
+  }
 };
 
-input?.addEventListener("input", updateSendButton);
+input.addEventListener("keyup", e);
 
 const go = () => {
-  inputdad?.classList.add("bottom");
-  titr?.classList.add("hidden");
-  titr2?.classList.add("hidden");
+  inputdad.classList.add("bottom");
+  titr.classList.add("hidden");
+  titr2.classList.add("hidden");
+};
+const remove = () => {
+  document.querySelector(".spy").remove();
+};
+const add = () => {
+  bodi.insertAdjacentHTML("beforeend", `<div class="spy "></div>`);
+};
+const scrol = () => {
+  document
+    .querySelector(".spy")
+    .scrollIntoView({ behavior: "smooth", block: "end" });
 };
 
-// Keep exactly ONE .spy element, and always keep it as the LAST child.
-const getSpy = () => {
-  if (!bodi) return null;
-
-  let spy = bodi.querySelector(".spy");
-
-  if (!spy) {
-    spy = document.createElement("div");
-    spy.className = "spy";
-  }
-
-  bodi.appendChild(spy);
-  return spy;
-};
-
-const scrollToSpy = () => {
-  const spy = getSpy();
-  spy?.scrollIntoView({ behavior: "smooth", block: "end" });
-};
-
-const appendMessage = (className, text = "") => {
-  if (!bodi) return null;
-
-  const message = document.createElement("div");
-  message.className = className;
-  message.textContent = text;
-  bodi.appendChild(message);
-
-  // Move the single spy to the end after every new message.
-  getSpy();
-  return message;
-};
-
-const setLoading = (loading) => {
-  one?.classList.toggle("hidden", loading);
-  two?.classList.toggle("hidden", loading);
-  three?.classList.toggle("hidden", !loading);
-  if (input) input.disabled = loading;
-  if (btn) btn.disabled = loading;
-};
-
-// IMPORTANT: a frontend API key is visible to every site visitor.
-// Use a restricted key only for temporary experiments, or move the request
-// to your own backend/serverless function for real security.
-const API_KEY = "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";
-const MODEL = "openrouter:free";
-const ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
+const API_KEY =
+  "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";
 
 const conversation = [];
 
-const SYSTEM_PROMPT = `
-نام این هوش مصنوعی zhugegbt است.
+const chatWithGroq = async () => {
+  one.classList.add("hidden");
+  two.classList.add("hidden");
+  three.classList.remove("hidden");
+  input.value = "";
+  input.disabled = true;
+  e();
+  try {
+    const response = await fetch(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + API_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "qwen/qwen3-30b-a3b:free",
+          max_tokens: 2000,
+          messages: [
+            {
+              role: "system",
+              content: `
+                 نام این هوش مصنوعی zhugegbt است.
 
-این سایت درباره دوران سه پادشاهی چین (Three Kingdoms) است.
-موضوعات اصلی گفتگو شامل تاریخ، شخصیت‌ها، نبردها، سیاست‌ها، روابط و وقایع دوران سه پادشاهی است.
+                این سایت درباره دوران سه پادشاهی چین (Three Kingdoms) است.
+                موضوعات اصلی گفتگو شامل تاریخ، شخصیت‌ها، نبردها، سیاست‌ها، روابط و وقایع دوران سه پادشاهی است.
 
-تو باید مانند ژوگه لیانگ (诸葛亮) صحبت کنی؛
-یعنی پاسخ‌هایت خردمندانه، آرام، استراتژیک و متناسب با شخصیت ژوگه لیانگ باشد.
+                تو باید مانند ژوگه لیانگ (诸葛亮) صحبت کنی؛
+                یعنی پاسخ‌هایت خردمندانه، آرام، استراتژیک و متناسب با شخصیت ژوگه لیانگ باشد.
 
-خودت را به عنوان یک هوش مصنوعی معرفی نکن، مگر اینکه کاربر مستقیماً درباره هویتت سؤال کند.
-در پاسخ‌ها از لحن ژوگه لیانگ استفاده کن، اما اطلاعات تاریخی را تا حد ممکن دقیق و واقعی ارائه بده.
+                خودت را به عنوان یک هوش مصنوعی معرفی نکن، مگر اینکه کاربر مستقیماً درباره هویتت سؤال کند.
+                در پاسخ‌ها از لحن ژوگه لیانگ استفاده کن، اما اطلاعات تاریخی را تا حد ممکن دقیق و واقعی ارائه بده.
 
-اگر کاربر درباره موضوعی خارج از دوران سه پادشاهی سؤال کرد، می‌توانی پاسخ بدهی، اما همچنان با لحن ژوگه لیانگ صحبت کن.
+                اگر کاربر درباره موضوعی خارج از دوران سه پادشاهی سؤال کرد، می‌توانی پاسخ بدهی، اما همچنان با لحن ژوگه لیانگ صحبت کن.
 
-همیشه پاسخ را به زبان کاربر بده.
-`.trim();
+                همیشه پاسخ را به زبان کاربر بده.`,
+            },
 
-const chatWithAI = async () => {
-  if (!API_KEY || API_KEY === "YOUR_OPENROUTER_API_KEY") {
-    throw new Error("API key is not configured");
+            ...conversation,
+          ],
+        }),
+      },
+    );
+    if (!response.ok) {
+      throw new Error("fetch error");
+    }
+    const data = await response.json();
+
+    return data.choices?.[0]?.message?.content;
+  } catch (error) {
+    one.classList.remove("hidden");
+    two.classList.remove("hidden");
+    three.classList.add("hidden");
+    input.disabled = false;
+    bodi.insertAdjacentHTML(
+      "beforeend",
+      `<div class="left ">oops!,something wrong, please try again</div>`,
+    );
+    scrol();
   }
-
-  const response = await fetch(ENDPOINT, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      max_tokens: 2000,
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        ...conversation,
-      ],
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error(`OpenRouter request failed: ${response.status}`);
-  }
-
-  const data = await response.json();
-  const content = data?.choices?.[0]?.message?.content?.trim();
-
-  if (!content) {
-    throw new Error("Empty AI response");
-  }
-
-  return content;
 };
 
-btn?.addEventListener("click", async () => {
-  const userMessage = input?.value.trim();
-  if (!userMessage || btn.disabled) return;
+btn.addEventListener("click", async () => {
+  if (input.value) {
+    go();
+    const userMessage = input.value;
+    bodi.insertAdjacentHTML(
+      "beforeend",
+      `<div class="right">${userMessage}</div>`,
+    );
+    bodi.insertAdjacentHTML("beforeend", `<div class="pending left"></div>`);
 
-  go();
-  setLoading(true);
-  input.value = "";
-  updateSendButton();
+    conversation.push({
+      role: "user",
+      content: userMessage,
+    });
 
-  appendMessage("right", userMessage);
-  const pending = appendMessage("pending left");
-  scrollToSpy();
+    const botReply = await chatWithGroq();
 
-  conversation.push({ role: "user", content: userMessage });
+    const pending = document.querySelector(".pending");
+    pending.remove();
 
-  try {
-    const botReply = await chatWithAI();
+    if (botReply) {
+      conversation.push({
+        role: "assistant",
+        content: botReply,
+      });
 
-    conversation.push({ role: "assistant", content: botReply });
+      bodi.insertAdjacentHTML("beforeend", `<div class="left"></div>`);
 
-    pending?.remove();
-    const message = appendMessage("left");
-    if (!message) return;
-
-    // textContent prevents HTML/DOM injection from model output.
-    let index = 0;
-    const typeNextCharacter = () => {
-      if (index >= botReply.length) {
-        setLoading(false);
-        scrollToSpy();
-        return;
+      const lastLeft = document.querySelectorAll(".left");
+      const last = lastLeft[lastLeft.length - 1];
+      let inner = "";
+      for (let i = 0; i < botReply.length; i++) {
+        setTimeout(
+          () => {
+            inner += botReply[i];
+            last.innerHTML = inner;
+          },
+          10 + i * 10,
+        );
+        scrol();
       }
-
-      message.textContent += botReply[index++];
-      scrollToSpy();
-      window.setTimeout(typeNextCharacter, 10);
-    };
-
-    typeNextCharacter();
-  } catch (error) {
-    console.error("AI chat error:", error);
-    pending?.remove();
-    appendMessage("left", "خطایی در ارتباط با دستیار رخ داد. لطفاً دوباره تلاش کن.");
-    setLoading(false);
-    scrollToSpy();
+      one.classList.remove("hidden");
+      two.classList.remove("hidden");
+      three.classList.add("hidden");
+      input.disabled = false;
+    }
   }
 });
-
-input?.addEventListener("keydown", (event) => {
-  if (event.key === "Enter" && !event.shiftKey) {
-    event.preventDefault();
-    btn?.click();
-  }
-});
-
-// Make sure the container starts with exactly one spy at the end.
-getSpy();
+//
