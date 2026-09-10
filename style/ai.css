@@ -403,6 +403,8 @@ a {
   font-size: 0.6rem;
   right: 50%;
   transform: translateX(50%);
+  width:100%;
+  text-align:center;
 }
 .right {
   width: fit-content;
