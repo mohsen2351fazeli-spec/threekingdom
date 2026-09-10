@@ -95,7 +95,7 @@ const chatWithGroq = async () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "openrouter:free",
+          model: "openrouter/free",
           max_tokens: 2000,
           messages: [
             {
