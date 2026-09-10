@@ -97,7 +97,7 @@ const setLoading = (loading) => {
 // IMPORTANT: a frontend API key is visible to every site visitor.
 // Use a restricted key only for temporary experiments, or move the request
 // to your own backend/serverless function for real security.
-const API_KEY = "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";
+const API_KEY = "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";
 const MODEL = "qwen/qwen3-30b-a3b:free";
 const ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
 
